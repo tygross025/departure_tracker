@@ -1,4 +1,5 @@
 import 'package:departure_tracker/station_card.dart';
+import 'package:departure_tracker/theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'add_station_screen.dart';
@@ -8,6 +9,7 @@ void main() {
   runApp(const MyApp());
 }
 
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -15,14 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Departure Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.red),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-        ),
-      ),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
+      darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
       themeMode: ThemeMode.system,
       home: const MainPage(),
     );
@@ -52,7 +48,7 @@ class _MainPageState extends State<MainPage> {
     final prefs = await SharedPreferences.getInstance();
     final List<String>? stations = prefs.getStringList('stationList');
     if(stations != null){
-      for(String statonString in stations!){
+      for(String statonString in stations){
         _cards.add(
           StationCard(station: Station.fromString(statonString), editing: _editingCards, onDelete: _onDelete,),
         );
