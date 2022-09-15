@@ -37,6 +37,7 @@ class _AddStationScreenState extends State<AddStationScreen> {
           child: Column(
             children: [
               TextFormField(
+                autofocus: true,
                 controller: _textInputController,
                 decoration: const InputDecoration(
                   hintText: 'Enter station name',
