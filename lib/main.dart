@@ -1,3 +1,4 @@
+import 'package:departure_tracker/station_card.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'add_station_screen.dart';
@@ -15,12 +16,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Departure Tracker',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.red),
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
           elevation: 0,
         ),
       ),
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode.system,
       home: const MainPage(),
     );
   }
@@ -34,8 +37,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
-  List<Widget> _cards = <Widget>[];
+  final List<StationCard> _cards = <StationCard>[];
+  final _editingCards = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -43,16 +46,19 @@ class _MainPageState extends State<MainPage> {
     super.initState();
   }
 
+
   _loadStationCards() async {
     //load station list from sharedPrefs
     final prefs = await SharedPreferences.getInstance();
     final List<String>? stations = prefs.getStringList('stationList');
-    for(String statonString in stations!){
-      _cards.add(
-        StationCard(station: Station.fromString(statonString)),
-      );
+    if(stations != null){
+      for(String statonString in stations!){
+        _cards.add(
+          StationCard(station: Station.fromString(statonString), editing: _editingCards, onDelete: _onDelete,),
+        );
+      }
+      setState(() {});
     }
-    setState(() {});
   }
 
   @override
@@ -62,11 +68,46 @@ class _MainPageState extends State<MainPage> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
+              title: const Text('Departures'),
               floating: true,
               actions:  [
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {},
+                IconButton(onPressed: () {
+                  if(_editingCards.value){
+                    setState(() {
+                      _editingCards.value = false;
+                    });
+                  } else {
+                    //open bottom sheet for app options
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context){
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                //if editing display exit button, otherwise show menu
+                                leading: const Icon(Icons.edit),
+                                title: const Text('Edit cards'),
+                                onTap: (){
+                                  _enterEditMode();
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.settings),
+                                title: const Text('App settings'),
+                                onTap: (){
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  }
+                },
+                    //if in card edit mode show exit button
+                    icon: (_editingCards.value)?  const ElevatedButton(
+                        onPressed: null, child: Text('Exit Edit Mode', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),))
+                        //else show menu button
+                        : const Icon(Icons.more_horiz),
                 ),
               ],
             ),
@@ -104,72 +145,36 @@ class _MainPageState extends State<MainPage> {
     if(result is Station){
       setState(() {
         _cards.add(
-          StationCard(station: result,),
+          StationCard(station: result, editing: _editingCards, onDelete: _onDelete,),
         );
       });
     }
   }
-}
 
-class StationCard extends StatefulWidget {
-  final Station station;
-  const StationCard({Key? key, required this.station}) : super(key: key);
-
-  @override
-  _StationCardState createState() => _StationCardState(station: station);
-}
-
-class _StationCardState extends State<StationCard> {
-  final Station station;
-  Timetable? _timetable;
-  final List<Widget> _destinationList = [];
-
-  _StationCardState({required this.station});
-
-  @override
-  void initState() {
-    setTimetable();
-    super.initState();
-  }
-
-  void setTimetable() async {
-    _timetable = await station.getTimetable();
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final timetable = _timetable;
-    if(timetable != null){
-      for(MapEntry entry in timetable.getDepartureInfo().entries){
-        String depTimes = '';
-        //concatenate departure time strings together
-        for(DateTime time in entry.value){
-          depTimes = '$depTimes${time.toIso8601String().substring(11,16)} ';
-        }
-        _destinationList.add(ListTile(
-          subtitle: Text(entry.key),
-          trailing: Text(depTimes),
-        ));
-      }
+  _onDelete(StationCard card) async {
+    //remove card from list
+    setState(() {
+      _cards.remove(card);
+    });
+    //delete card from prefs
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? stations = prefs.getStringList('stationList');
+    if(stations != null){
+      stations.remove('${card.station.name}|${card.station.id}');
+      await prefs.setStringList('stationList', stations);
     }
+  }
 
-    List<Widget> columnChildren  = [
-        ListTile(
-          title: Text(station.name),
-          //trailing: const Icon(Icons.more_vert),
-        ),
-    ];
-    columnChildren.addAll(_destinationList);
+  _enterEditMode(){
+    setState(() {
+      _editingCards.value = true; //Set cards to editmode state
+    });
+    Navigator.pop(context); //close BottomSheet
 
-    return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: columnChildren,
-      ),
-    );
   }
 }
+
+
 
 
 
