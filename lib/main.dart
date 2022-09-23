@@ -1,29 +1,49 @@
+import 'package:departure_tracker/settings_screen.dart';
 import 'package:departure_tracker/station_card.dart';
-import 'package:departure_tracker/theme/color_schemes.dart';
+import 'package:departure_tracker/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'add_station_screen.dart';
 import 'http_service.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final themeProvider = ThemeProvider();
+  await themeProvider.init();
+  runApp(MyApp(themeProvider: themeProvider,));
 }
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeProvider themeProvider;
+
+  const MyApp({super.key, required this.themeProvider,});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Departure Tracker',
-      theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
-      darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
-      themeMode: ThemeMode.system,
-      home: const MainPage(),
+    return ChangeNotifierProvider<ThemeProvider>(
+      create: (_) => themeProvider,
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) => const MaterialAppWithTheme(),
+      ),
     );
   }
 }
+
+class MaterialAppWithTheme extends StatelessWidget {
+  const MaterialAppWithTheme({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context);
+    return MaterialApp(
+      home: const MainPage(),
+      theme: theme.getTheme(),
+    );
+  }
+}
+
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -92,6 +112,14 @@ class _MainPageState extends State<MainPage> {
                                 leading: const Icon(Icons.settings),
                                 title: const Text('App settings'),
                                 onTap: (){
+                                  //close Bottom sheet
+                                  Navigator.pop(context);
+                                  //launch settings page
+                                  Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) =>
+                                      const SettingsScreen()
+                                    )
+                                  );
                                 },
                               ),
                             ],

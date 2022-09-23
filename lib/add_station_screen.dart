@@ -2,7 +2,6 @@ import 'package:departure_tracker/http_service.dart';
 import 'package:flutter/material.dart';
 
 class AddStationScreen extends StatefulWidget {
-  //const AddStationScreen({Key? key}) : super(key: key);
   const AddStationScreen({Key? key, required this.cards}) : super(key: key);
   final List<Widget> cards;
 
@@ -40,6 +39,7 @@ class _AddStationScreenState extends State<AddStationScreen> {
                 autofocus: true,
                 controller: _textInputController,
                 decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
                   hintText: 'Enter station name',
                 ),
                 validator: (value){
