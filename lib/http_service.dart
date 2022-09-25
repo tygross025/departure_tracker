@@ -82,7 +82,7 @@ class Timetable {
         _departureInfo.addEntries([MapEntry(trip.plannedDestination, newDateTime)]);
       } else {
         //destination not in map so add it as well as time to list
-        _departureInfo.addEntries([MapEntry(trip.plannedDestination, [trip.plannedDepartureTime])]);
+        _departureInfo.addEntries([MapEntry('${trip.category}${trip.lineName} ${trip.plannedDestination}', [trip.plannedDepartureTime])]);
       }
     }
 
