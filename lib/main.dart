@@ -85,7 +85,8 @@ class _MainPageState extends State<MainPage> {
           slivers: [
             SliverAppBar(
               title: const Text('Departures'),
-              floating: true,
+              centerTitle: true,
+              floating: false,
               actions:  [
                 IconButton(onPressed: () {
                   if(_editingCards.value){

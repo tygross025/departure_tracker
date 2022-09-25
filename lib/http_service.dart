@@ -68,6 +68,11 @@ class Timetable {
     //generate map
     _departureInfo = {};
     for(Trip trip in trips){
+      if(trip.plannedDepartureTime.isBefore(DateTime.now())){
+        //if trip is in the past dont add it
+        continue;
+      }
+
       if(_departureInfo.containsKey(trip.plannedDestination)){
         //if destination is already in map add departure time to time list
         List<DateTime>? newDateTime = _departureInfo[trip.plannedDestination];
@@ -80,6 +85,12 @@ class Timetable {
         _departureInfo.addEntries([MapEntry(trip.plannedDestination, [trip.plannedDepartureTime])]);
       }
     }
+
+    //sort departure times for each destination in ascending order
+    for (var list in _departureInfo.values) {
+      list.sort((a,b) => a.compareTo(b));
+    }
+
     return _departureInfo;
   }
 }
