@@ -54,6 +54,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final List<StationCard> _cards = <StationCard>[];
+  final List<String> _stations = [];
   final _editingCards = ValueNotifier<bool>(false);
 
   @override
@@ -69,8 +70,9 @@ class _MainPageState extends State<MainPage> {
     final List<String>? stations = prefs.getStringList('stationList');
     if(stations != null){
       for(String statonString in stations){
+        Station station = Station.fromString(statonString);
         _cards.add(
-          StationCard(station: Station.fromString(statonString), editing: _editingCards, onDelete: _onDelete,),
+          StationCard(station: station, editing: _editingCards, onDelete: _onDelete,),
         );
       }
       setState(() {});
@@ -168,6 +170,19 @@ class _MainPageState extends State<MainPage> {
     if(!mounted) return;
 
     if(result is Station){
+      for(StationCard card in _cards){
+        if(card.station.id == result.id){
+          //station is already in list
+          SnackBar snackBar = const SnackBar(
+            content: Text('Station already in list'),
+            duration: Duration(seconds: 5),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          return;
+        }
+      }
+
       setState(() {
         _cards.add(
           StationCard(station: result, editing: _editingCards, onDelete: _onDelete,),
