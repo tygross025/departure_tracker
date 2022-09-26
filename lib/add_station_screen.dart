@@ -7,12 +7,10 @@ class AddStationScreen extends StatefulWidget {
   final List<Widget> cards;
 
   @override
-  _AddStationScreenState createState() => _AddStationScreenState(cards: cards);
+  State<AddStationScreen> createState() => _AddStationScreenState();
 }
 
 class _AddStationScreenState extends State<AddStationScreen> {
-  _AddStationScreenState({required this.cards});
-  final List<Widget> cards;
   final _formKey = GlobalKey<FormState>();
   final _textInputController = TextEditingController();
   bool _validStation = false;

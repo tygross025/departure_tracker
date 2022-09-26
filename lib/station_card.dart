@@ -15,7 +15,7 @@ class StationCard extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StationCardState createState() => _StationCardState();
+  State<StationCard> createState() => _StationCardState();
 }
 
 class _StationCardState extends State<StationCard> {
@@ -146,7 +146,7 @@ class FullScreenCard extends StatefulWidget {
   final Station station;
 
   @override
-  _FullScreenCardState createState() => _FullScreenCardState();
+  State<FullScreenCard> createState() => _FullScreenCardState();
 }
 
 class _FullScreenCardState extends State<FullScreenCard> {

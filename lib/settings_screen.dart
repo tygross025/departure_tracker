@@ -35,7 +35,7 @@ class ThemeSelection extends StatefulWidget {
   const ThemeSelection({Key? key}) : super(key: key);
 
   @override
-  _ThemeSelectionState createState() => _ThemeSelectionState();
+  State<ThemeSelection> createState() => _ThemeSelectionState();
 }
 
 class _ThemeSelectionState extends State<ThemeSelection> {
@@ -75,7 +75,6 @@ class _ThemeSelectionState extends State<ThemeSelection> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     int selectedColor = 1;
 
     _selectedDarkMode ??= <bool>[false,false,false];

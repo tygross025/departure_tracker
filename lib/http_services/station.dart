@@ -1,6 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart';
-import 'package:departure_tracker/http_services/timetable.dart';
 import 'package:http/http.dart';
 import '../auth/api_keys.dart';
 
