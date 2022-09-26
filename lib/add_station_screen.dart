@@ -1,5 +1,6 @@
-import 'package:departure_tracker/http_service.dart';
 import 'package:flutter/material.dart';
+
+import 'http_services/station.dart';
 
 class AddStationScreen extends StatefulWidget {
   const AddStationScreen({Key? key, required this.cards}) : super(key: key);
@@ -58,7 +59,7 @@ class _AddStationScreenState extends State<AddStationScreen> {
                     setState(() {
                       _isLoading = true;
                     });
-                    Station? station = await getStation(_textInputController.text);
+                    Station? station = await Station.getStation(_textInputController.text);
                     setState(() {
                       _isLoading = false;
                     });

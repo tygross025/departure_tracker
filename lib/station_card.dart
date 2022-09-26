@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'http_service.dart';
+import 'http_services/station.dart';
+import 'http_services/timetable.dart';
 
 class StationCard extends StatefulWidget {
   final Station station;
@@ -20,14 +21,16 @@ class StationCard extends StatefulWidget {
 class _StationCardState extends State<StationCard> {
   final List<Widget> _destinationList = [];
 
-  Future<Timetable?> getTimetable() async {
-    return Future.value(widget.station.getTimetable());
+  Future<Map<String, List<DateTime>>> _getTimetableMap() async {
+    Timetable timetable = await Timetable.fromStation(widget.station);
+    Map<String, List<DateTime>> departures = await timetable.getDepartureInfo();
+    return departures;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getTimetable(),
+        future: _getTimetableMap(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             //display loading animation in card
@@ -51,7 +54,7 @@ class _StationCardState extends State<StationCard> {
             } else {
               final timetable = snapshot.data;
               if (timetable != null) {
-                for (MapEntry entry in timetable.getDepartureInfo().entries) {
+                for (MapEntry entry in timetable.entries) {
                   //show end station followed by next departure time
                   _destinationList.add(ListTile(
                     subtitle: Text(entry.key),
@@ -149,14 +152,16 @@ class FullScreenCard extends StatefulWidget {
 class _FullScreenCardState extends State<FullScreenCard> {
   List<Widget> _destinationList = [];
 
-  Future<Timetable?> getTimetable() async {
-    return Future.value(widget.station.getTimetable());
+  Future<Map<String, List<DateTime>>> _getTimetableMap() async {
+    Timetable timetable = await Timetable.fromStation(widget.station);
+    Map<String, List<DateTime>> departures = await timetable.getDepartureInfo();
+    return departures;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getTimetable(),
+        future: _getTimetableMap(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             //todo loading animation
@@ -173,7 +178,7 @@ class _FullScreenCardState extends State<FullScreenCard> {
               _destinationList = [];
               if (timetable != null) {
                 //add all destination entries into list
-                for (MapEntry entry in timetable.getDepartureInfo().entries) {
+                for (MapEntry entry in timetable.entries) {
                   String timesString = '';
                   for (DateTime time in entry.value) {
                     timesString =
